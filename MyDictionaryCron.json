@@ -1,0 +1,210 @@
+{
+  "name": "MyDictionaryCron",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 10-23,0 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "404b3ab6-adea-4b6a-9229-68bdebce3353",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appgArQMKmrH9SNvM",
+          "mode": "list",
+          "cachedResultName": "Dictionary",
+          "cachedResultUrl": "https://airtable.com/appgArQMKmrH9SNvM"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltVtgM6dv1FVNtQ",
+          "mode": "list",
+          "cachedResultName": "DictionaryTable",
+          "cachedResultUrl": "https://airtable.com/appgArQMKmrH9SNvM/tbltVtgM6dv1FVNtQ"
+        },
+        "filterByFormula": "=IS_AFTER({Date}, DATEADD(NOW(), -2, \"days\"))",
+        "options": {}
+      },
+      "id": "746ee5cc-f334-45be-bf38-89c15e407488",
+      "name": "Search Last 2 Days Records",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "l8qmmXOwwOpF3Zqw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "8372855811",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "cf9f5f8d-7965-43ba-9775-772a691ae7b0",
+      "name": "Send a text message",
+      "webhookId": "36da2246-dd6b-43d9-9d7f-e0036c1082c7",
+      "credentials": {
+        "telegramApi": {
+          "id": "C5GR2o0OmFsFBJ5i",
+          "name": "DictionaryBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "message",
+              "value": "={{ $json.data.map(item => \"**\" + item.Word + \"**\\n\\n\" + item.Meaning + \"\\n\\n\" + \"─\".repeat(30)).join(\"\\n\\n\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "46bd647e-1c74-4ebb-91d7-c61faa6233b4",
+      "name": "Format Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "ecd63b90-cd85-49a9-9766-fa5936b67de8",
+      "name": "Combine All Messages",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const MAX_LENGTH = 3200;\nconst message = items[0].json.message;\nconst chunks = [];\n\nif (message.length <= MAX_LENGTH) {\n  return items;\n}\n\nconst entries = message.split(\"─\".repeat(30) + \"\\n\\n\");\nlet currentChunk = \"\";\n\nfor (let i = 0; i < entries.length; i++) {\n  const entry = entries[i];\n  const separator = i < entries.length - 1 ? \"─\".repeat(30) + \"\\n\\n\" : \"\";\n  const testChunk = currentChunk + entry + separator;\n  \n  if (testChunk.length > MAX_LENGTH && currentChunk) {\n    chunks.push({ json: { message: currentChunk.trim() } });\n    currentChunk = entry + separator;\n  } else {\n    currentChunk = testChunk;\n  }\n}\n\nif (currentChunk.trim()) {\n  chunks.push({ json: { message: currentChunk.trim() } });\n}\n\nreturn chunks;"
+      },
+      "id": "c80c1766-9dcf-490a-8aa9-f2393c965a42",
+      "name": "Split Long Messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search Last 2 Days Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Last 2 Days Records": {
+      "main": [
+        [
+          {
+            "node": "Combine All Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Format Message": {
+      "main": [
+        [
+          {
+            "node": "Split Long Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine All Messages": {
+      "main": [
+        [
+          {
+            "node": "Format Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Long Messages": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "994b53dd-f6b4-4e0d-be01-0f3ba021c792",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e226ed51ad5a103586cfbf5e802aba1614c146d84337d15d983edbd23ab49897"
+  },
+  "id": "JEHbDl8fsAWgZj90",
+  "tags": []
+}

@@ -1,0 +1,26 @@
+{
+  "name": "telegram-vocab-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot-based AI vocabulary assistant that fetches Hindi meanings and sends periodic recall messages",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "vocabulary",
+    "hindi",
+    "airtable"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "airtable": "^0.12.2",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "node-cron": "^3.0.3",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}
