@@ -24,9 +24,9 @@ function initCron() {
     return;
   }
 
-  // Run every hour at minute 0
+  // Run every minute for testing
   cron.schedule(
-    "0 * * * *",
+    "* * * * *",
     async () => {
       console.log(
         `⏰ Recall agent triggered at ${getZonedTimeString()} (${CRON_TIMEZONE})`,
@@ -60,7 +60,7 @@ function initCron() {
   );
 
   console.log(
-    `✅ Recall agent scheduled (every hour) in ${CRON_TIMEZONE}. Current time: ${getZonedTimeString()}`,
+    `✅ Recall agent scheduled (every minute) in ${CRON_TIMEZONE}. Current time: ${getZonedTimeString()}`,
   );
 }
 
