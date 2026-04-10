@@ -1,6 +1,6 @@
 const cron = require("node-cron");
-const { getRecentWords } = require("./airtable");
-const { getBot, formatRecallMessage } = require("./bot");
+const { getRecentWords, getRecentSentences } = require("./airtable");
+const { getBot, formatRecallMessage, formatSentenceMessage } = require("./bot");
 
 const CRON_TIMEZONE = "Asia/Kolkata";
 
@@ -61,6 +61,45 @@ function initCron() {
 
   console.log(
     `✅ Recall agent scheduled (every hour) in ${CRON_TIMEZONE}. Current time: ${getZonedTimeString()}`,
+  );
+
+  // Sentence cron: 10am, 12pm, 3pm, 8pm IST
+  cron.schedule(
+    "0 10,12,15,20 * * *",
+    async () => {
+      console.log(
+        `📝 Sentence agent triggered at ${getZonedTimeString()} (${CRON_TIMEZONE})`,
+      );
+
+      try {
+        const sentences = await getRecentSentences(5);
+
+        if (sentences.length === 0) {
+          console.log("📭 No sentences available, skipping");
+          return;
+        }
+
+        const message = formatSentenceMessage(sentences);
+        const bot = getBot();
+
+        if (!bot) {
+          console.error("❌ Bot not initialized, cannot send sentence message");
+          return;
+        }
+
+        await bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
+        console.log(`✅ Sentence message sent to chat ${chatId}`);
+      } catch (err) {
+        console.error(`❌ Sentence agent error: ${err.message}`);
+      }
+    },
+    {
+      timezone: CRON_TIMEZONE,
+    },
+  );
+
+  console.log(
+    `✅ Sentence agent scheduled (10am, 12pm, 3pm, 8pm) in ${CRON_TIMEZONE}`,
   );
 }
 

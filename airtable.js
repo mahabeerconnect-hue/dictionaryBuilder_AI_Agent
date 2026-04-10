@@ -93,4 +93,30 @@ async function getRecentWords(count = 5) {
   }
 }
 
-module.exports = { initAirtable, saveWord, getRecentWords };
+async function getRecentSentences(count = 5) {
+  const table = getTable();
+
+  try {
+    const records = await table
+      .select({
+        maxRecords: count,
+        sort: [{ field: "Date", direction: "desc" }],
+        filterByFormula: `{sentence} != ''`,
+        fields: ["Word", "sentence"],
+      })
+      .firstPage();
+
+    const sentences = records.map((record) => ({
+      word: record.get("Word"),
+      sentence: record.get("sentence"),
+    }));
+
+    console.log(`📋 Fetched ${sentences.length} recent sentences from Airtable`);
+    return sentences;
+  } catch (err) {
+    console.error(`❌ Error fetching sentences from Airtable: ${err.message}`);
+    throw err;
+  }
+}
+
+module.exports = { initAirtable, saveWord, getRecentWords, getRecentSentences };

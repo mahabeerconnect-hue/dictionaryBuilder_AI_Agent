@@ -145,8 +145,17 @@ function formatRecallMessage(words) {
   return message;
 }
 
+function formatSentenceMessage(sentences) {
+  let message = "📝 *Recent Sentences:*\n\n";
+  sentences.forEach((item, index) => {
+    message += `${index + 1}. *${item.word}* → _${item.sentence}_\n`;
+  });
+  message += "\n📚 _Use them in your own sentences today!_";
+  return message;
+}
+
 function getBot() {
   return bot;
 }
 
-module.exports = { initBot, getBot, formatRecallMessage };
+module.exports = { initBot, getBot, formatRecallMessage, formatSentenceMessage };
