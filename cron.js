@@ -33,7 +33,7 @@ function initCron() {
       );
 
       try {
-        const words = await getRecentWords(5);
+        const words = await getRecentWords(10);
 
         if (words.length === 0) {
           console.log("📭 No words to recall, skipping");
