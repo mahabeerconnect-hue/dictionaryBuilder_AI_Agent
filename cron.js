@@ -24,9 +24,9 @@ function initCron() {
     return;
   }
 
-  // Run every hour at minute 0
+  // Run every hour from 9am to 11pm IST
   cron.schedule(
-    "0 * * * *",
+    "0 9-23 * * *",
     async () => {
       console.log(
         `⏰ Recall agent triggered at ${getZonedTimeString()} (${CRON_TIMEZONE})`,
@@ -63,9 +63,9 @@ function initCron() {
     `✅ Recall agent scheduled (every hour) in ${CRON_TIMEZONE}. Current time: ${getZonedTimeString()}`,
   );
 
-  // Sentence cron: 10am, 12pm, 3pm, 8pm IST
+  // Sentence cron: 10am, 12pm, 3pm, 8pm, 10pm, 11pm, 12am IST
   cron.schedule(
-    "0 10,12,15,20 * * *",
+    "0 10,12,15,20,22,23,0 * * *",
     async () => {
       console.log(
         `📝 Sentence agent triggered at ${getZonedTimeString()} (${CRON_TIMEZONE})`,

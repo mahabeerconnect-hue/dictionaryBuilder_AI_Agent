@@ -148,9 +148,10 @@ function formatRecallMessage(words) {
 function formatSentenceMessage(sentences) {
   let message = "📝 *Recent Sentences:*\n\n";
   sentences.forEach((item, index) => {
-    message += `${index + 1}. *${item.word}* → _${item.sentence}_\n`;
+    message += `${index + 1}. *${item.word}*\n`;
+    message += `    💬 _${item.sentence}_\n\n\n`;
   });
-  message += "\n📚 _Use them in your own sentences today!_";
+  message += "📚 _Use them in your own sentences today!_";
   return message;
 }
 
