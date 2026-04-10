@@ -158,4 +158,9 @@ function getBot() {
   return bot;
 }
 
-module.exports = { initBot, getBot, formatRecallMessage, formatSentenceMessage };
+module.exports = {
+  initBot,
+  getBot,
+  formatRecallMessage,
+  formatSentenceMessage,
+};

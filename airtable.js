@@ -111,7 +111,9 @@ async function getRecentSentences(count = 5) {
       sentence: record.get("sentence"),
     }));
 
-    console.log(`📋 Fetched ${sentences.length} recent sentences from Airtable`);
+    console.log(
+      `📋 Fetched ${sentences.length} recent sentences from Airtable`,
+    );
     return sentences;
   } catch (err) {
     console.error(`❌ Error fetching sentences from Airtable: ${err.message}`);
